@@ -5,8 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SeaStrike2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+        WindowStartupLocation="CenterScreen" 
+        Background="Transparent"
+        AllowsTransparency="True"
+        WindowStyle="None"  MouseDown="Window_MouseDown"
+        Title="SeaStrike" Height="675" Width="1200">
+    <Border CornerRadius="25" Background="LightSkyBlue">
+        <Grid>
+            <Grid.Background>
+                <ImageBrush ImageSource="images/background.png" Stretch="Fill" />
+            </Grid.Background>
+            <Button x:Name="btnPartyCreate" Content="Party létrhozása" Width="200" Height="40" Margin="500,375,500,260" Click="btnPartyCreate_Click"/>
+            <TextBox x:Name="txtPartyCode" Width="100" Height="20" Margin="550,416,550,239"/>
+            <Button x:Name="btnPartyJoin" Content="Party-hoz csatlakozás" Width="200" Height="40" Margin="300,320,300,74" Click="btnPartyJoin_Click"/>
+            <Button x:Name="btnCredits" Content="Készítők" Width="200" Height="40" Margin="300,365,300,29" Click="btnCredits_Click"/>
+            <Button x:Name="btnExit" Content="Kilépés" Width="200" Height="40" Margin="500,530,500,105" Click="btnExit_Click"/>
+        </Grid>
+    </Border>
 </Window>
