@@ -60,7 +60,7 @@ A SeaStrike2 egy klasszikus Torpedó játék, amely online és offline módban i
 ## Képernyőkép
 
 ![SeaStrike2 Screenshot](https://i.imgur.com/KtANvBt.png)
-![SeaStrike2 Screenshot](https://i.imgur.com/aBDxYdz.png
+![SeaStrike2 Screenshot](https://i.imgur.com/aBDxYdz.png)
 
 ## Kapcsolat
 
