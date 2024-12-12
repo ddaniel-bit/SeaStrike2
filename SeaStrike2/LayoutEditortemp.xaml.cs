@@ -56,6 +56,7 @@ namespace SeaStrike2
 
         private string partyid;
         private int clientid;
+        private CancellationTokenSource _cancellationTokenSource;
         public LayoutEditortemp(string partyID, int clientID)
         {
             InitializeComponent();
@@ -201,7 +202,7 @@ namespace SeaStrike2
             }
         }
 
-        private void FinishButtontemp_Click(object sender, RoutedEventArgs e)
+        private async void FinishButtontemp_Click(object sender, RoutedEventArgs e)
         {
             // Get the formatted matrix string
             string formattedMatrix = MatrixToString(gridState);
@@ -210,7 +211,8 @@ namespace SeaStrike2
             MessageBox.Show(formattedMatrix, "Matrix State", MessageBoxButton.OK, MessageBoxImage.Information);
 
             ModifyTableAsync(partyid);
-            
+            _cancellationTokenSource = new CancellationTokenSource();
+            await MonitorOtherClientMessage(partyid, _cancellationTokenSource.Token);
 
         }
 
@@ -229,7 +231,7 @@ namespace SeaStrike2
                     data = new
                     {
                         Client1Message = "matrixsent",
-                        Client1Matrix = "adadadasdasd"
+                        Client1Matrix = EgySorbaRendezes(gridMatrix)
                     };
                 }
                 else if (clientid == 2)
@@ -238,7 +240,7 @@ namespace SeaStrike2
                     data = new
                     {
                         Client2Message = "matrixsent",
-                        Client2Matrix = "adadadasdas"
+                        Client2Matrix = EgySorbaRendezes(gridMatrix)
                     };
                 }
                 else
@@ -262,6 +264,28 @@ namespace SeaStrike2
                 var updatedData = await GetClient2MessageAsync(tableName);
             }
         }
+        private async Task MonitorOtherClientMessage(string tableName, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                // Ellenőrizzük a Client2Message mezőt
+                string otherclientmessage = await GetClient2MessageAsync(tableName);
+
+                // Ha a Client2Message módosult
+                if (otherclientmessage != null && otherclientmessage != "")
+                {
+
+                    if (otherclientmessage == "matrixsent")
+                    {
+                        MessageBox.Show("megkaptam");
+                        break;
+                    }
+
+                }
+
+                await Task.Delay(1000); // Várunk egy másodpercet a következő ellenőrzés előtt
+            }
+        }
         private async Task<string> GetClient2MessageAsync(string tableName)
         {
             using (var client = new HttpClient())
@@ -281,7 +305,15 @@ namespace SeaStrike2
                 }
 
                 var tableData = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
-                return tableData?.Client2Message;
+                if (clientid == 1)
+                {
+                    return tableData?.Client2Message;
+                }
+                else
+                {
+                    return tableData?.Client1Message;
+                }
+                
             }
         }
 
