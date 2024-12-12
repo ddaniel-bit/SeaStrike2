@@ -1,4 +1,4 @@
-# SeaStrike2 (Firebase Edition)
+# SeaStrike2 (Firebase Edition) - Alpha
 
 ## Készítő csapat
 
@@ -55,7 +55,7 @@ A következő  direktívák szükségesek:
 
 ## Játékmenet
 
-A SeaStrike2 egy klasszikus Torpedó játék, amely online és offline módban is játszható. A játék célja az ellenfél hajóinak elsüllyesztése.
+A SeaStrike2 egy klasszikus Torpedó játék, amely online módban játszható. A játék célja az ellenfél hajóinak elsüllyesztése.
 
 ## Képernyőkép
 
@@ -64,4 +64,4 @@ A SeaStrike2 egy klasszikus Torpedó játék, amely online és offline módban i
 
 ## Kapcsolat
 
-Ha bármilyen kérdésed vagy észrevételed van, fordulj hozzánk bizalommal!
+Email: 20.danko.daniel.janos@mechwart.com
