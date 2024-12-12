@@ -13,11 +13,11 @@
             <RowDefinition Height="*"/>
             <!-- Finish button -->
         </Grid.RowDefinitions>
-        <StackPanel>
-            <Label x:Name="lbUsername"  Content="• Username" FontSize="16" Foreground="Green"/>
-        </StackPanel>
+        <Label x:Name="lbUsername"  Content="• Username" FontSize="16" Foreground="Green"/>
+        <Label x:Name="lbYourStat"  Content="0/17" FontSize="16" Foreground="Green" Margin="438,0,-438,0"/>
+        <Label x:Name="lbOppStat"  Content="0/17" FontSize="16" Foreground="Red" Margin="438,18,-438,416" Grid.RowSpan="2"/>
 
-        <Label Content="Rajtad a sor..." Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Foreground="Green" Visibility="Collapsed" x:Name="lblYou"/>
+            <Label Content="Rajtad a sor..." Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Foreground="Green" Visibility="Collapsed" x:Name="lblYou"/>
         <Label Content="Az ellenfél van soron..." Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Foreground="Red" Visibility="Visible" x:Name="lblOpp"/>
         <!-- 10x10 hajó elhelyezési terület -->
         <UniformGrid Rows="10" Columns="10" Background="LightBlue" Grid.Row="1" x:Name="GameGrid">

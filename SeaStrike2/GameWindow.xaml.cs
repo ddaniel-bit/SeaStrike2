@@ -109,9 +109,6 @@ namespace SeaStrike2
                 clickedButton.Background = Brushes.Gray;
                 clickedButton.Content = "🧨";
             }
-            else {
-                MessageBox.Show("nem te vagy soron "+ clientsData["WhoIsNext"]);
-            }
         }
         private async Task TorpedoFigyelo(string tableName, CancellationToken cancellationToken)
         {
@@ -146,6 +143,26 @@ namespace SeaStrike2
 
                         TeJossz();
                         _cancellationTokenSource.Cancel();
+                    }
+                    else if (client2Message.Contains("lose") && clientid == 1 && int.Parse(whoisnext) == 3)
+                    {
+                        MessageBox.Show("Győztél!");
+                        break;
+                    }
+                    else if (client2Message.Contains("lose") && clientid == 2 && int.Parse(whoisnext) == 4)
+                    {
+                        MessageBox.Show("Győztél!");
+                        break;
+                    }
+                    else if (int.Parse(whoisnext) == 4 && clientid == 1)
+                    {
+                        MessageBox.Show("Vesztettél!");
+                        break;
+                    }
+                    else if (int.Parse(whoisnext) == 3 && clientid == 2)
+                    {
+                        MessageBox.Show("Vesztettél!");
+                        break;
                     }
                 }
 
@@ -354,8 +371,9 @@ namespace SeaStrike2
         {
             using (var client = new HttpClient())
             {
+                clientsData = await GetClientsData(partyid);
                 string url = $"{_firebaseDatabaseUrl}{tableName}.json?auth={_firebaseApiKey}";
-
+                
                 // Inicializáljuk a 'data' változót
                 object data;
                 string[] xy = kapottcoord.Split(',');
@@ -369,19 +387,47 @@ namespace SeaStrike2
                     if (clientid == 1)
                     {
                         // Client1 adatainak frissítése
-                        data = new
+                        if (int.Parse(clientsData["Client2Points"]) ==16)
                         {
-                            Client1TalalatErt = $"{kapottcoord}"
-                        };
+                            data = new
+                            {
+                                Client1TalalatErt = $"{kapottcoord}",
+                                Client2Points = int.Parse(clientsData["Client2Points"]) + 1,
+                                WhoIsNext = "3",
+                                Client1Message = "lose"
+                            };
+                        }
+                        else
+                        {
+                            data = new
+                            {
+                                Client1TalalatErt = $"{kapottcoord}",
+                                Client2Points = int.Parse(clientsData["Client2Points"]) + 1
+                            };
+                        }
+                        
 
                     }
                     else if (clientid == 2)
                     {
-                        // Client2 adatainak frissítése
-                        data = new
+                        if (int.Parse(clientsData["Client1Points"]) == 16) {
+                            data = new
+                            {
+                                Client2TalalatErt = $"{kapottcoord}",
+                                Client1Points = int.Parse(clientsData["Client1Points"]) + 1,
+                                WhoIsNext = "4",
+                                Client2Message = "lose"
+                            };
+                        }
+                        else
                         {
-                            Client2TalalatErt = $"{kapottcoord}"
-                        };
+                            data = new
+                            {
+                                Client2TalalatErt = $"{kapottcoord}",
+                                Client1Points = int.Parse(clientsData["Client1Points"]) + 1
+                            };
+                        }
+                            
 
                     }
                     else
@@ -436,7 +482,7 @@ namespace SeaStrike2
                 {
                     throw new Exception("Nem sikerült módosítani a táblát.");
                 }
-
+                UpdateClientsData();
             }
         }
 
@@ -452,10 +498,14 @@ namespace SeaStrike2
             if (clientid == 1 && clientsData.ContainsKey("Client2Username"))
             {
                 lbUsername.Content = $"•{clientsData["Client2Username"]}";
+                lbYourStat.Content = $"{clientsData["Client1Points"]}/17";
+                lbOppStat.Content = $"{clientsData["Client2Points"]}/17";
             }
             else if (clientid == 2 && clientsData.ContainsKey("Client1Username"))
             {
                 lbUsername.Content = $"•{clientsData["Client1Username"]}";
+                lbYourStat.Content = $"{clientsData["Client2Points"]}/17";
+                lbOppStat.Content = $"{clientsData["Client1Points"]}/17";
             }
             else
             {
@@ -491,9 +541,11 @@ namespace SeaStrike2
                     otherUserData.Add("Client1Matrix", tableData.Client1Matrix != null ? tableData.Client1Matrix.ToString() : "N/A");
                     otherUserData.Add("Client1Username", tableData.Client1Username != null ? tableData.Client1Username.ToString() : "N/A");
                     otherUserData.Add("Client1TalalatErt", tableData.Client1TalalatErt != null ? tableData.Client1TalalatErt.ToString() : "N/A");
+                    otherUserData.Add("Client1Points", tableData.Client1Points != null ? tableData.Client1Points.ToString() : "N/A");
                     otherUserData.Add("Client2Matrix", tableData.Client2Matrix != null ? tableData.Client2Matrix.ToString() : "N/A");
                     otherUserData.Add("Client2Username", tableData.Client2Username != null ? tableData.Client2Username.ToString() : "N/A");
                     otherUserData.Add("Client2TalalatErt", tableData.Client2TalalatErt != null ? tableData.Client2TalalatErt.ToString() : "N/A");
+                    otherUserData.Add("Client2Points", tableData.Client2Points != null ? tableData.Client2Points.ToString() : "N/A");
                     otherUserData.Add("WhoIsNext", tableData.WhoIsNext != null ? tableData.WhoIsNext.ToString() : "N/A");
                 }
                 if (true)

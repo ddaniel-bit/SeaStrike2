@@ -113,11 +113,13 @@ namespace SeaStrike2
                     Client1Username = "Client1",
                     Client1Matrix = "",
                     Client1TalalatErt = "",
+                    Client1Points = "0",
                     Client2Message = "",
                     Client2Username = "",
                     Client2Matrix = "",
                     Client2TalalatErt = "",
-                    WhoIsNext = ""
+                    Client2Points = "0",
+                    WhoIsNext = "0"
                 };
 
                 // Serialize the data to JSON
