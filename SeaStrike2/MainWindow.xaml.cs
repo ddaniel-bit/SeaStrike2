@@ -27,7 +27,6 @@ namespace SeaStrike2
                 string tableName = GenerateRandomString(5);
                 await CreateTableInFirebaseAsync(tableName);
                 MessageBox.Show($"Party létrehozva: {tableName}", "Siker", MessageBoxButton.OK, MessageBoxImage.Information);
-
                 // Indítjuk a folyamatos ellenőrző ciklust
                 _cancellationTokenSource = new CancellationTokenSource();
                 await MonitorClient2MessageAsync(tableName, _cancellationTokenSource.Token);
@@ -36,6 +35,7 @@ namespace SeaStrike2
             {
                 MessageBox.Show($"Hiba történt: {ex.Message}", "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            
         }
 
         private async Task MonitorClient2MessageAsync(string tableName, CancellationToken cancellationToken)
@@ -112,9 +112,12 @@ namespace SeaStrike2
                     Client1Message = "wait",
                     Client1Username = "Client1",
                     Client1Matrix = "",
+                    Client1TalalatErt = "",
                     Client2Message = "",
                     Client2Username = "",
-                    Client2Matrix = ""
+                    Client2Matrix = "",
+                    Client2TalalatErt = "",
+                    WhoIsNext = ""
                 };
 
                 // Serialize the data to JSON
