@@ -208,7 +208,7 @@ namespace SeaStrike2
             string formattedMatrix = MatrixToString(gridState);
 
             // Show the formatted matrix in a MessageBox
-            //MessageBox.Show(formattedMatrix, "Matrix State", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(formattedMatrix, "Matrix State", MessageBoxButton.OK, MessageBoxImage.Information);
 
             ModifyTableAsync(partyid);
             _cancellationTokenSource = new CancellationTokenSource();
@@ -277,7 +277,7 @@ namespace SeaStrike2
 
                     if (otherclientmessage == "matrixsent")
                     {
-                        GameWindow gamewindow = new GameWindow(partyid, clientid, gridMatrix);
+                        GameWindow gamewindow = new GameWindow(partyid, clientid, gridState);
                         gamewindow.Show();
                         this.Close();
                         break;

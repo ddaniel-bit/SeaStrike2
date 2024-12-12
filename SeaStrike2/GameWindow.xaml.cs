@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -37,13 +38,51 @@ namespace SeaStrike2
             partyid = partyID;
             clientid = clientID;
             _gridMatrix = gridMatrix;
+            ReplaceNegativeOneWithZero();
             UpdateClientsData();
+            MatrixBejelolese();
             if (clientid == 1 && elsoletetel)
             {
                 TeJossz();
             }
             else {
                 NemTeJossz();
+            }
+
+        }
+        private void ReplaceNegativeOneWithZero()
+        {
+            for (int i = 0; i < _gridMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < _gridMatrix.GetLength(1); j++)
+                {
+                    if (_gridMatrix[i, j] == -1)
+                    {
+                        _gridMatrix[i, j] = 0;
+                    }
+                }
+            }
+        }
+        private void MatrixBejelolese()
+        {
+            for (int i = 0; i < _gridMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < _gridMatrix.GetLength(1); j++)
+                {
+                    if (_gridMatrix[i, j] == 1)
+                    {
+                        
+                        int x = i+1;
+                        int y = j+1;
+
+                        var button = FindGridButtonByTag(x, y);
+                        if (button != null)
+                        {
+                            // A gomb háttérszínének módosítása pirosra
+                            button.Background = new SolidColorBrush(Color.FromRgb(190, 190, 190));
+                        }
+                    }
+                }
             }
         }
         private async void GridButton_Click(object sender, RoutedEventArgs e)
@@ -60,6 +99,7 @@ namespace SeaStrike2
                 elsoletetel = false;
                 TorpedoFirebase(partyid, value);
                 clickedButton.Background = Brushes.Gray;
+                clickedButton.Content = "🧨";
             }
             else if (int.TryParse(clientsData["WhoIsNext"], out int whoIsNext) && whoIsNext == clientid)
             {
@@ -67,6 +107,7 @@ namespace SeaStrike2
                 elsoletetel = false;
                 TorpedoFirebase(partyid, value);
                 clickedButton.Background = Brushes.Gray;
+                clickedButton.Content = "🧨";
             }
             else {
                 MessageBox.Show("nem te vagy soron "+ clientsData["WhoIsNext"]);
@@ -98,7 +139,9 @@ namespace SeaStrike2
                         if (button != null)
                         {
                             // A gomb háttérszínének módosítása pirosra
-                            button.Background = Brushes.Red;
+                            button.Background = Brushes.LightSeaGreen;
+                            button.Content = "🧨";
+                            TalalatVisszajelzesFirebase(partyid, coordinates);
                         }
 
                         TeJossz();
@@ -191,6 +234,7 @@ namespace SeaStrike2
         {
             lblYou.Visibility = Visibility.Visible;
             lblOpp.Visibility = Visibility.Collapsed;
+            Talalte();
         }
         private async void NemTeJossz()
         {
@@ -199,6 +243,46 @@ namespace SeaStrike2
             _cancellationTokenSource = new CancellationTokenSource();
             await TorpedoFigyelo(partyid, _cancellationTokenSource.Token);
             UpdateClientsData();
+        }
+
+        private async void Talalte()
+        {
+            clientsData = await GetClientsData(partyid);
+
+            // Kiírás MessageBox-ba az összes adatot
+            //string message = string.Join(Environment.NewLine, clientsData.Select(kvp => $"Key: {kvp.Key}, Value: {kvp.Value}"));
+            //MessageBox.Show(message, "Clients Data");
+
+            // lbUsername.Content beállítása a clientid alapján
+            if (clientid == 1 && clientsData["Client2TalalatErt"].Contains(","))
+            {
+                string[] coords = clientsData["Client2TalalatErt"].Split(',');
+                int x = int.Parse(coords[0]);
+                int y = int.Parse(coords[1]);
+
+                // A megfelelő gomb keresése a koordináták alapján
+                var button = FindGridButtonByTag(x, y);
+                if (button != null)
+                {
+                    // A gomb háttérszínének módosítása pirosra
+                    button.Background = Brushes.Green;
+                    button.Content = "💥";
+                }
+            }
+            else if (clientid == 2 && clientsData["Client1TalalatErt"].Contains(","))
+            {
+                string[] coords = clientsData["Client1TalalatErt"].Split(',');
+                int x = int.Parse(coords[0]);
+                int y = int.Parse(coords[1]);
+
+                // A megfelelő gomb keresése a koordináták alapján
+                var button = FindGridButtonByTag(x, y);
+                if (button != null)
+                {
+                    // A gomb háttérszínének módosítása pirosra
+                    button.Background = Brushes.Green;
+                }
+            }
         }
 
         private async Task TorpedoFirebase(string tableName, string coord)
@@ -249,7 +333,112 @@ namespace SeaStrike2
 
             }
         }
+        private string MatrixToString(int[,] matrix)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+            string result = "";
 
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    result += matrix[i, j] + " ";
+                }
+                result += "\n";
+            }
+
+            return result;
+        }
+        private async Task TalalatVisszajelzesFirebase(string tableName, string kapottcoord)
+        {
+            using (var client = new HttpClient())
+            {
+                string url = $"{_firebaseDatabaseUrl}{tableName}.json?auth={_firebaseApiKey}";
+
+                // Inicializáljuk a 'data' változót
+                object data;
+                string[] xy = kapottcoord.Split(',');
+                string formattedMatrix = MatrixToString(_gridMatrix);
+
+                // Show the formatted matrix in a MessageBox
+                //MessageBox.Show(formattedMatrix, "Matrix State", MessageBoxButton.OK, MessageBoxImage.Information);
+                //MessageBox.Show($"DEBUG: koordináta: {kapottcoord} konvertált: {int.Parse(xy[0]) - 1},{int.Parse(xy[1]) - 1}, érték a mátrixban: {_gridMatrix[int.Parse(xy[0]) - 1, int.Parse(xy[1]) - 1]}");
+                if (_gridMatrix[int.Parse(xy[0])-1, int.Parse(xy[1])-1] == 1)
+                {
+                    if (clientid == 1)
+                    {
+                        // Client1 adatainak frissítése
+                        data = new
+                        {
+                            Client1TalalatErt = $"{kapottcoord}"
+                        };
+
+                    }
+                    else if (clientid == 2)
+                    {
+                        // Client2 adatainak frissítése
+                        data = new
+                        {
+                            Client2TalalatErt = $"{kapottcoord}"
+                        };
+
+                    }
+                    else
+                    {
+                        throw new Exception("Érvénytelen clientid érték!");
+                    }
+                    
+                    int x = int.Parse(xy[0]);
+                    int y = int.Parse(xy[1]);
+
+                    var button = FindGridButtonByTag(x, y);
+                    if (button != null)
+                    {
+                        // A gomb háttérszínének módosítása pirosra
+                        button.Background = Brushes.Red;
+                        button.Content = "💀";
+                    }
+                }
+                else
+                {
+                    if (clientid == 1)
+                    {
+                        // Client1 adatainak frissítése
+                        data = new
+                        {
+                            Client1TalalatErt = ""
+                        };
+
+                    }
+                    else if (clientid == 2)
+                    {
+                        // Client2 adatainak frissítése
+                        data = new
+                        {
+                            Client2TalalatErt = ""
+                        };
+
+                    }
+                    else
+                    {
+                        throw new Exception("Érvénytelen clientid érték!");
+                    }
+                }
+                // JSON-ba sorosítjuk az adatokat
+                var jsonData = JsonConvert.SerializeObject(data);
+                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                // PATCH kérést küldünk
+                var response = await client.PatchAsync(url, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("Nem sikerült módosítani a táblát.");
+                }
+
+            }
+        }
 
         private async void UpdateClientsData()
         {
@@ -301,8 +490,10 @@ namespace SeaStrike2
                 {
                     otherUserData.Add("Client1Matrix", tableData.Client1Matrix != null ? tableData.Client1Matrix.ToString() : "N/A");
                     otherUserData.Add("Client1Username", tableData.Client1Username != null ? tableData.Client1Username.ToString() : "N/A");
+                    otherUserData.Add("Client1TalalatErt", tableData.Client1TalalatErt != null ? tableData.Client1TalalatErt.ToString() : "N/A");
                     otherUserData.Add("Client2Matrix", tableData.Client2Matrix != null ? tableData.Client2Matrix.ToString() : "N/A");
                     otherUserData.Add("Client2Username", tableData.Client2Username != null ? tableData.Client2Username.ToString() : "N/A");
+                    otherUserData.Add("Client2TalalatErt", tableData.Client2TalalatErt != null ? tableData.Client2TalalatErt.ToString() : "N/A");
                     otherUserData.Add("WhoIsNext", tableData.WhoIsNext != null ? tableData.WhoIsNext.ToString() : "N/A");
                 }
                 if (true)
